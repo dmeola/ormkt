@@ -26,6 +26,7 @@ cur = conn.cursor()
 
 SQL_column_names = ', '.join('?' * len(column_names))
 
+#creating tempory table for direct import from xls
 createTemp = 'CREATE TEMPORARY TABLE IF NOT EXISTS import(Ord_No INT, \
     Booked_Date DATE, \
     Order_Date DATE, \
@@ -43,12 +44,15 @@ createTemp = 'CREATE TEMPORARY TABLE IF NOT EXISTS import(Ord_No INT, \
     Dcode VARCHAR(45))'
 cur.execute(createTemp)
 
+#inserting xls data into temporary table
 for counter in range(len(insert_values)):
     params = ['?' for item in insert_values[counter]]
     values = ", ".join([str(val) for val in insert_values[counter]])
-    print values
+    print insert_values[counter]
     statement = "INSERT INTO import (Ord_No,Booked_Date,Order_Date,Cust_PO,Order_Type,Hospital_PO,Loc_No,Site_No,Cust_No,Ship_To_Name,Item_No,Description,Qty,Total,Dcode) VALUES ({0});".format(params)
-    cur.executemany(statement, insert_values[counter])
+
+    #cur.executemany(statement, insert_values[counter])
+    cur.executemany(statement, ('493773','13-Mar-15','13-Mar-15','PO982628','ILS Standard Order','test','71209','144755','108222','HAYMARKET MEDICAL CENTER HAYMARKET VA 20169','225444','HOHMANN RETR 6-1/4 15MM WIDE','6','375','D1741'))
 
 statement = 'INSERT INTO orders VALUES (%s);' %SQL_column_names
 
