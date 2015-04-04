@@ -28,8 +28,13 @@ cur = conn.cursor()
 
 SQL_column_names = ', '.join('?' * len(column_names))
 
-
 statement = 'CREATE TEMPORARY TABLE IF NOT EXISTS import'
+
+for counter in range(len(insert_values)):
+    values = ", ".join([str(val) for val in insert_values[counter]])
+    statement = 'INSERT INTO import VALUES (%s);'.format(values)
+    cur.executemany(statement, insert_values[counter])
+
 statement = 'INSERT INTO orders VALUES (%s);' %SQL_column_names
 
 #insert_values = conn.escape('[{0}]'.format(insert_values))
