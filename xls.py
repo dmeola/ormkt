@@ -18,8 +18,6 @@ for row_idx in range(11, 13):
     for col_idx in range(0, sh.ncols):  				# Iterate through columns
         cell_obj = sh.cell(row_idx, col_idx)  			# Get cell object by row, col
         insert_values[row_idx-11].append(cell_obj.value)
-        print (cell_obj.value)
-    print "================"
 
 #MySQL connector
 conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='', db='ormkt_db')
@@ -28,11 +26,28 @@ cur = conn.cursor()
 
 SQL_column_names = ', '.join('?' * len(column_names))
 
-statement = 'CREATE TEMPORARY TABLE IF NOT EXISTS import'
+createTemp = 'CREATE TEMPORARY TABLE IF NOT EXISTS import(Ord_No INT, \
+    Booked_Date DATE, \
+    Order_Date DATE, \
+    Cust_PO INT, \
+    Order_Type VARCHAR(45), \
+    Hospital_PO INT, \
+    Loc_No INT, \
+    Site_No INT, \
+    Cust_No INT, \
+    Ship_To_Name VARCHAR(45), \
+    Item_No INT, \
+    Description VARCHAR(45), \
+    Qty INT, \
+    Total INT, \
+    Dcode VARCHAR(45))'
+cur.execute(createTemp)
 
 for counter in range(len(insert_values)):
+    params = ['?' for item in insert_values[counter]]
     values = ", ".join([str(val) for val in insert_values[counter]])
-    statement = 'INSERT INTO import VALUES (%s);'.format(values)
+    print values
+    statement = "INSERT INTO import (Ord_No,Booked_Date,Order_Date,Cust_PO,Order_Type,Hospital_PO,Loc_No,Site_No,Cust_No,Ship_To_Name,Item_No,Description,Qty,Total,Dcode) VALUES ({0});".format(params)
     cur.executemany(statement, insert_values[counter])
 
 statement = 'INSERT INTO orders VALUES (%s);' %SQL_column_names
@@ -42,9 +57,6 @@ statement = 'INSERT INTO orders VALUES (%s);' %SQL_column_names
 print('INSERT VALUES')
 print(insert_values)
 
-#insertStatement = 'INSERT INTO orders (order_id, customer_id, customer_PO, order_type, order_date, booked_date)	VALUES {0}'.format(insert_values)
-
-#statement = 'INSERT INTO orders (order_id, customer_id, customer_PO, order_type, order_date, booked_date) VALUES (%s, %s, %s, %s, %s, %s)'
 
 #insertStatement = conn.escape(insertStatement)
 
